@@ -31,10 +31,11 @@ namespace ConsimpleMidTest.Models
                     connection.Open();
 
                     var command = connection.CreateCommand();
-                    command.CommandText = "SELECT purchase_pivot.id, amount, purchase.purchase_date, product.title, product.price " +
+                    command.CommandText = "SELECT purchase_pivot.id, amount, purchase.purchase_date, product.title, product.price, client.full_name " +
                         "FROM purchase_pivot " +
                         "INNER JOIN purchase ON purchase_id=purchase.id " +
                         "INNER JOIN product ON product_id=product.id " +
+                        "INNER JOIN client ON client_id=client.id " +
                         "WHERE purchase_pivot.purchase_id=@id;";
                     command.Parameters.AddWithValue("@id", Id);
 
@@ -48,7 +49,8 @@ namespace ConsimpleMidTest.Models
                                 Amount = reader.GetInt32(1),
                                 PurchaseDate = DateTime.ParseExact(reader.GetString(2), "yyyy-MM-dd", null),
                                 Title = reader.GetString(3),
-                                Price = reader.GetDecimal(4)
+                                Price = reader.GetDecimal(4),
+                                ClientName = reader.GetString(5)
                             });
                         }
                     }

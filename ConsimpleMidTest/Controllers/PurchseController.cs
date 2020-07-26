@@ -114,5 +114,41 @@ namespace ConsimpleMidTest.Controllers
         public void Delete(int id)
         {
         }
+
+        [Route("/api/Purchase/Days/{days}")]
+        [HttpGet]
+        public List<PurchasePivotModel> GetLastPurchases(int days)
+        {
+            List<PurchasePivotModel> purchases = new List<PurchasePivotModel>();
+            string now = DateTime.Now.ToString("yyyy-MM-dd");
+            string before = DateTime.Now.AddDays(-days).ToString("yyyy-MM-dd");
+
+            using(var connection = new SqliteConnection(ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT client_id, client.full_name, purchase.purchase_date FROM purchase_pivot " +
+                    "INNER JOIN client ON client_id=client.id " +
+                    "INNER JOIN purchase ON purchase_id=purchase.id " +
+                    "WHERE purchase_date >= @before AND purchase_date <= @now " +
+                    "ORDER BY purchase.purchase_date DESC;";
+                command.Parameters.AddWithValue("@before", before);
+                command.Parameters.AddWithValue("@now", now);
+
+                using(var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        purchases.Add(new PurchasePivotModel
+                        {
+                            ClientId = reader.GetInt32(0),
+                            ClientName = reader.GetString(1),
+                            PurchaseDate = DateTime.ParseExact(reader.GetString(2), "yyyy-MM-dd", null)
+                        });
+                    }
+                }
+            }
+            return purchases;
+        }
     }
 }

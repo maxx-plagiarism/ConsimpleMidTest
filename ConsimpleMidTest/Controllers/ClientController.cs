@@ -115,5 +115,40 @@ namespace ConsimpleMidTest.Controllers
         public void Delete(int id)
         {
         }
+        
+        [Route("/api/Client/Birthday/{date}")]
+        [HttpGet]
+        // date format 'MM-dd'
+        public List<ClientModel> GetBirthday(string date)
+        {
+            List<ClientModel> birthdays = new List<ClientModel>();
+
+             using( var connection = new SqliteConnection(ConnectionString))
+             {
+                 if(connection != null)
+                 {
+                     connection.Open();
+                     var command = connection.CreateCommand();
+                    // I know it's bad desigion bit it is quick one :(
+                     command.CommandText = "SELECT id, full_name, birthday, registration_date FROM client WHERE birthday LIKE '%" + date +"';";
+                     // command.Parameters.AddWithValue("@date", date);
+                     using(var reader = command.ExecuteReader())
+                     {
+                         while (reader.Read())
+                         {
+                             birthdays.Add(new ClientModel
+                             {
+                                 Id = reader.GetInt32(0),
+                                 FullName = reader.GetString(1),
+                                 Birthday = DateTime.ParseExact(reader.GetString(2), "yyyy-MM-dd", null),
+                                 RegistrationDate = DateTime.ParseExact(reader.GetString(3), "yyyy-MM-dd", null)
+                             });
+                         }
+                     }
+
+                 }
+             }
+             return birthdays;
+        }
     }
 }

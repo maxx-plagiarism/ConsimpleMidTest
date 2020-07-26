@@ -14,5 +14,7 @@ namespace ConsimpleMidTest.Models
         public string Title { get; set; }
         public DateTime PurchaseDate { get; set; }
         public int Amount { get; set; }
+        public int ClientId { get; set; }
+        public string ClientName { get; set; }
     }
 }

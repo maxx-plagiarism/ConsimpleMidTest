@@ -52,7 +52,8 @@ namespace ConsimpleMidTest
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         purchase_id INTEGER,
                         product_id INTEGER,
-                        amount INTEGER
+                        amount INTEGER,
+                        client_id INTEGER
                     );";
                     command.ExecuteNonQuery();
                 }
